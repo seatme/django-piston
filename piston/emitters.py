@@ -245,13 +245,15 @@ class Emitter(object):
 
             else:
                 for f in data._meta.fields:
-                    ret[f.attname] = _any(getattr(data, f.attname))
+                    if not f.attname.startswith("_"):
+                        ret[f.attname] = _any(getattr(data, f.attname))
 
                 fields = dir(data.__class__) + ret.keys()
                 add_ons = [k for k in dir(data) if k not in fields]
 
                 for k in add_ons:
-                    ret[k] = _any(getattr(data, k))
+                    if not k.startswith("_"):
+                        ret[k] = _any(getattr(data, k))
 
             # resouce uri
             if self.in_typemapper(type(data), self.anonymous):
