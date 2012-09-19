@@ -248,6 +248,10 @@ class Emitter(object):
                     if not f.attname.startswith("_"):
                         ret[f.attname] = _any(getattr(data, f.attname))
 
+                if hasattr(data, "_piston"):
+                    for f,v in data._piston['fields'].items():
+                        ret[f] = _any(v)
+
                 fields = dir(data.__class__) + ret.keys()
                 add_ons = [k for k in dir(data) if k not in fields]
 
