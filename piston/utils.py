@@ -84,7 +84,7 @@ class rc_factory(object):
         else:
             HttpResponseWrapper = HttpResponse
 
-        return HttpResponseWrapper(r, content_type='application/json', status=c)
+        return HttpResponseWrapper(r, content_type='text/plain', status=c)
     
 rc = rc_factory()
     
