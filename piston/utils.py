@@ -1,4 +1,7 @@
 import time
+import json
+
+import django
 from django.http import HttpResponseNotAllowed, HttpResponseForbidden, HttpResponse, HttpResponseBadRequest
 from django.core.urlresolvers import reverse
 from django.core.cache import cache
@@ -49,26 +52,46 @@ class rc_factory(object):
 
         class HttpResponseWrapper(HttpResponse):
             """
-            Wrap HttpResponse and make sure that the internal _is_string
-            flag is updated when the _set_content method (via the content
-            property) is called
+            Wrap HttpResponse and make sure that the internal
+            _is_string/_base_content_is_iter flag is updated when the
+            _set_content method (via the content property) is called
             """
             def _set_content(self, content):
                 """
-                Set the _container and _is_string properties based on the
-                type of the value parameter. This logic is in the construtor
-                for HttpResponse, but doesn't get repeated when setting
-                HttpResponse.content although this bug report (feature request)
-                suggests that it should: http://code.djangoproject.com/ticket/9403
+                Set the _container and _is_string /
+                _base_content_is_iter properties based on the type of
+                the value parameter. This logic is in the construtor
+                for HttpResponse, but doesn't get repeated when
+                setting HttpResponse.content although this bug report
+                (feature request) suggests that it should:
+                http://code.djangoproject.com/ticket/9403
                 """
+
+                if isinstance(content, dict):
+                    # this is a json response, set content type and content accordingly
+                    content = json.dumps(content)
+                    self['Content-Type'] = 'application/json'
+
+                is_string = False
                 if not isinstance(content, basestring) and hasattr(content, '__iter__'):
                     self._container = content
-                    self._is_string = False
                 else:
                     self._container = [content]
-                    self._is_string = True
+                    is_string = True
+                if django.VERSION >= (1, 4):
+                    self._base_content_is_iter = not is_string
+                else:
+                    self._is_string = is_string
 
-            content = property(HttpResponse._get_content, _set_content)
+            if django.VERSION >= (1, 5):
+                # HttpResponse._get_content does not exists in Django 1.5
+
+                @HttpResponse.content.setter
+                def content(self, content):
+                    self._set_content(content)
+
+            else:
+                content = property(HttpResponse._get_content, _set_content)
 
         return HttpResponseWrapper(r, content_type='text/plain', status=c)
 
