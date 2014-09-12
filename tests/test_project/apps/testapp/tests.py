@@ -1,7 +1,11 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
-from django.utils import simplejson
 from django.conf import settings
+
+try:
+    import simplejson
+except ImportError:
+    import json as simplejson
 
 from piston import oauth
 from piston.models import Consumer, Token

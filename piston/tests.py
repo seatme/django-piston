@@ -4,7 +4,11 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.template import loader, TemplateDoesNotExist
 from django.http import HttpRequest, HttpResponse
-from django.utils import simplejson
+
+try:
+    import simplejson
+except ImportError:
+    import json as simplejson
 
 # Piston imports
 from test import TestCase
