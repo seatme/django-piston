@@ -12,7 +12,7 @@ import os
 
 setup(
     name = "django-piston",
-    version = "0.2.3.sm8",
+    version = "0.2.3.sm9",
     url = 'http://bitbucket.org/jespern/django-piston/wiki/Home',
 	download_url = 'http://bitbucket.org/jespern/django-piston/downloads/',
     license = 'BSD',
