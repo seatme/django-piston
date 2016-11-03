@@ -9,12 +9,13 @@ from django.core.mail import send_mail, EmailMessage
 from django.db.models.query import QuerySet
 from django.http import Http404
 
-from emitters import Emitter
-from handler import typemapper
-from doc import HandlerMethod
-from authentication import NoAuthentication
-from utils import coerce_put_post, FormValidationError, HttpStatusCode
-from utils import rc, format_error, translate_mime, MimerDataException
+from .emitters import Emitter
+from .handler import typemapper
+from .doc import HandlerMethod
+from .authentication import NoAuthentication
+from .utils import coerce_put_post, FormValidationError, HttpStatusCode
+from .utils import rc, format_error, translate_mime, MimerDataException
+import collections
 
 CHALLENGE = object()
 
@@ -30,8 +31,8 @@ class Resource(object):
                 'PUT': 'update', 'DELETE': 'delete' }
 
     def __init__(self, handler, authentication=None):
-        if not callable(handler):
-            raise AttributeError, "Handler not callable."
+        if not isinstance(handler, collections.Callable):
+            raise AttributeError("Handler not callable.")
 
         self.handler = handler()
         self.csrf_exempt = getattr(self.handler, 'csrf_exempt', True)
@@ -86,10 +87,10 @@ class Resource(object):
         if hasattr(self.handler, 'anonymous'):
             anon = self.handler.anonymous
 
-            if callable(anon):
+            if isinstance(anon, collections.Callable):
                 return anon
 
-            for klass in typemapper.keys():
+            for klass in list(typemapper.keys()):
                 if anon == klass.__name__:
                     return klass
 
@@ -162,7 +163,7 @@ class Resource(object):
 
         try:
             result = meth(request, *args, **kwargs)
-        except Exception, e:
+        except Exception as e:
             result = self.error_handler(e, request, meth, em_format)
 
         try:
@@ -208,7 +209,7 @@ class Resource(object):
             resp.streaming = self.stream
 
             return resp
-        except HttpStatusCode, e:
+        except HttpStatusCode as e:
             return e.response
 
     @staticmethod
@@ -220,10 +221,10 @@ class Resource(object):
         for method_type in ('GET', 'PUT', 'POST', 'DELETE'):
             block = getattr(request, method_type, { })
 
-            if True in [ k.startswith("oauth_") for k in block.keys() ]:
+            if True in [ k.startswith("oauth_") for k in list(block.keys()) ]:
                 sanitized = block.copy()
 
-                for k in sanitized.keys():
+                for k in list(sanitized.keys()):
                     if k.startswith("oauth_"):
                         sanitized.pop(k)
 

@@ -60,9 +60,9 @@ def is_valid_javascript_identifier(identifier, escape=r'\u', ucd_cat=category):
     if not identifier:
         return False
 
-    if not isinstance(identifier, unicode):
+    if not isinstance(identifier, str):
         try:
-            identifier = unicode(identifier, 'utf-8')
+            identifier = str(identifier, 'utf-8')
         except UnicodeDecodeError:
             return False
 
@@ -76,12 +76,12 @@ def is_valid_javascript_identifier(identifier, escape=r'\u', ucd_cat=category):
             if len(segment) < 4:
                 return False
             try:
-                add_char(unichr(int('0x' + segment[:4], 16)))
+                add_char(chr(int('0x' + segment[:4], 16)))
             except Exception:
                 return False
             add_char(segment[4:])
             
-        identifier = u''.join(new)
+        identifier = ''.join(new)
 
     if is_reserved_js_word(identifier):
         return False
@@ -103,11 +103,11 @@ def is_valid_javascript_identifier(identifier, escape=r'\u', ucd_cat=category):
 def is_valid_jsonp_callback_value(value):
     """Return whether the given ``value`` can be used as a JSON-P callback."""
 
-    for identifier in value.split(u'.'):
+    for identifier in value.split('.'):
         while '[' in identifier:
             if not has_valid_array_index(identifier):
                 return False
-            identifier = replace_array_index(u'', identifier)
+            identifier = replace_array_index('', identifier)
         if not is_valid_javascript_identifier(identifier):
             return False
 
@@ -140,16 +140,16 @@ def test():
       >>> is_valid_javascript_identifier('$210')
       True
 
-      >>> is_valid_javascript_identifier(u'Stra\u00dfe')
+      >>> is_valid_javascript_identifier(u'Stra\\u00dfe')
       True
 
-      >>> is_valid_javascript_identifier(r'\u0062') # u'b'
+      >>> is_valid_javascript_identifier(r'\\u0062') # u'b'
       True
 
-      >>> is_valid_javascript_identifier(r'\u62')
+      >>> is_valid_javascript_identifier(r'\\u62')
       False
 
-      >>> is_valid_javascript_identifier(r'\u0020')
+      >>> is_valid_javascript_identifier(r'\\u0020')
       False
 
       >>> is_valid_javascript_identifier('_bar')

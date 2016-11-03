@@ -8,7 +8,7 @@ from piston import oauth
 from piston.models import Consumer, Token
 
 # 3rd/Python party imports
-import httplib2, urllib, cgi
+import httplib2, urllib.request, urllib.parse, urllib.error, cgi
 
 URLENCODED_FORM_CONTENT = 'application/x-www-form-urlencoded'
 

@@ -8,11 +8,9 @@ except ImportError:
     ez_setup.use_setuptools()
     from setuptools import setup, find_packages
 
-import os
-
 setup(
     name = "django-piston",
-    version = "0.2.3.sm12",
+    version = "1.0.0-yr.alpha",  # version 1.0.0 supports python3
     url = 'http://bitbucket.org/jespern/django-piston/wiki/Home',
 	download_url = 'http://bitbucket.org/jespern/django-piston/downloads/',
     license = 'BSD',
