@@ -154,8 +154,6 @@ def test():
     """
     """
 
-      >>> is_valid_javascript_identifier(r'\u62')
-      False
     """
     """
 
