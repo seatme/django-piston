@@ -82,7 +82,7 @@ def is_valid_javascript_identifier(identifier, escape=r'\u', ucd_cat=category):
             except Exception:
                 return False
             add_char(segment[4:])
-            
+
         identifier = u''.join(new)
 
     if is_reserved_js_word(identifier):
@@ -162,7 +162,8 @@ def test():
 
       >>> is_valid_javascript_identifier('$')
       True
-
+    """
+    """
     But ``is_valid_jsonp_callback_value`` is the function you want to use for
     validating JSON-P callback parameter values:
 
@@ -210,3 +211,4 @@ def test():
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+
