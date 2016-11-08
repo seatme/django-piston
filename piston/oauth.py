@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from __future__ import absolute_import
 import cgi
 import urllib
 import time
@@ -29,6 +30,8 @@ import random
 import urlparse
 import hmac
 import binascii
+import six
+from six.moves import range
 
 
 VERSION = '1.0' # Hi Blaine!
@@ -51,7 +54,7 @@ def escape(s):
 
 def _utf8_str(s):
     """Convert unicode to utf-8."""
-    if isinstance(s, unicode):
+    if isinstance(s, six.text_type):
         return s.encode("utf-8")
     else:
         return str(s)
@@ -193,7 +196,7 @@ class OAuthRequest(object):
     def get_nonoauth_parameters(self):
         """Get any non-OAuth parameters."""
         parameters = {}
-        for k, v in self.parameters.iteritems():
+        for k, v in six.iteritems(self.parameters):
             # Ignore oauth parameters.
             if k.find('oauth_') < 0:
                 parameters[k] = v
@@ -204,7 +207,7 @@ class OAuthRequest(object):
         auth_header = 'OAuth realm="%s"' % realm
         # Add the oauth parameters.
         if self.parameters:
-            for k, v in self.parameters.iteritems():
+            for k, v in six.iteritems(self.parameters):
                 if k[:6] == 'oauth_':
                     auth_header += ', %s="%s"' % (k, escape(str(v)))
         return {'Authorization': auth_header}
@@ -212,7 +215,7 @@ class OAuthRequest(object):
     def to_postdata(self):
         """Serialize as post data for a POST request."""
         return '&'.join(['%s=%s' % (escape(str(k)), escape(str(v))) \
-            for k, v in self.parameters.iteritems()])
+            for k, v in six.iteritems(self.parameters)])
 
     def to_url(self):
         """Serialize as a URL for a GET request."""
@@ -359,7 +362,7 @@ class OAuthRequest(object):
     def _split_url_string(param_str):
         """Turn URL string into parameters."""
         parameters = cgi.parse_qs(param_str, keep_blank_values=False)
-        for k, v in parameters.iteritems():
+        for k, v in six.iteritems(parameters):
             parameters[k] = urllib.unquote(v[0])
         return parameters
     _split_url_string = staticmethod(_split_url_string)
@@ -471,7 +474,7 @@ class OAuthServer(object):
             # Get the signature method object.
             signature_method = self.signature_methods[signature_method]
         except:
-            signature_method_names = ', '.join(self.signature_methods.keys())
+            signature_method_names = ', '.join(list(self.signature_methods.keys()))
             raise OAuthError('Signature method %s not supported try one of the '
                 'following: %s' % (signature_method, signature_method_names))
 

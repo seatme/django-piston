@@ -1,7 +1,8 @@
 from __future__ import generators
 
+from __future__ import absolute_import
 import decimal, re, inspect
-import copy
+import six
 
 try:
     # yaml isn't standard with python.  It shouldn't be required if it
@@ -23,8 +24,8 @@ except NameError:
 from django.db.models.query import QuerySet
 from django.db.models import Model, permalink
 from django.utils.xmlutils import SimplerXMLGenerator
-from django.utils.encoding import smart_unicode
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.utils.encoding import smart_text
+from django.core.urlresolvers import NoReverseMatch
 from django.core.serializers.json import DateTimeAwareJSONEncoder
 from django.http import HttpResponse
 from django.core import serializers
@@ -34,8 +35,8 @@ try:
 except ImportError:
     import json as simplejson
 
-from utils import HttpStatusCode, Mimer
-from validate_jsonp import is_valid_jsonp_callback_value
+from .utils import HttpStatusCode, Mimer
+from .validate_jsonp import is_valid_jsonp_callback_value
 
 try:
     import cStringIO as StringIO
@@ -43,7 +44,7 @@ except ImportError:
     import StringIO
 
 try:
-    import cPickle as pickle
+    import six.moves.cPickle as pickle
 except ImportError:
     import pickle
 
@@ -95,7 +96,7 @@ class Emitter(object):
         """
         Recursively serialize a lot of types, and
         in cases where it doesn't recognize the type,
-        it will fall back to Django's `smart_unicode`.
+        it will fall back to Django's `smart_text`.
 
         Returns `dict`.
         """
@@ -127,7 +128,7 @@ class Emitter(object):
             elif repr(thing).startswith("<django.db.models.fields.related.RelatedManager"):
                 ret = _any(thing.all())
             else:
-                ret = smart_unicode(thing, strings_only=True)
+                ret = smart_text(thing, strings_only=True)
 
             return ret
 
@@ -182,7 +183,7 @@ class Emitter(object):
 
                     # sets can be negated.
                     for exclude in exclude_fields:
-                        if isinstance(exclude, basestring):
+                        if isinstance(exclude, six.string_types):
                             get_fields.discard(exclude)
 
                         elif isinstance(exclude, re._pattern_type):
@@ -256,7 +257,7 @@ class Emitter(object):
                     for f,v in data._piston['fields'].items():
                         ret[f] = _any(v)
 
-                fields = dir(data.__class__) + ret.keys()
+                fields = dir(data.__class__) + list(ret.keys())
                 add_ons = [k for k in dir(data) if k not in fields]
 
                 for k in add_ons:
@@ -271,7 +272,7 @@ class Emitter(object):
 
                     try:
                         ret['resource_uri'] = reverser( lambda: (url_id, fields) )()
-                    except NoReverseMatch, e:
+                    except NoReverseMatch as e:
                         pass
 
             if hasattr(data, 'get_api_url') and 'resource_uri' not in ret:
@@ -301,13 +302,13 @@ class Emitter(object):
             """
             Dictionaries.
             """
-            return dict([ (k, _any(v, fields)) for k, v in data.iteritems() ])
+            return dict([ (k, _any(v, fields)) for k, v in six.iteritems(data) ])
 
         # Kickstart the seralizin'.
         return _any(self.data, self.fields)
 
     def in_typemapper(self, model, anonymous):
-        for klass, (km, is_anon) in self.typemapper.iteritems():
+        for klass, (km, is_anon) in six.iteritems(self.typemapper):
             if model is km and is_anon is anonymous:
                 return klass
 
@@ -332,7 +333,7 @@ class Emitter(object):
         """
         Gets an emitter, returns the class and a content-type.
         """
-        if cls.EMITTERS.has_key(format):
+        if format in cls.EMITTERS:
             return cls.EMITTERS.get(format)
 
         raise ValueError("No emitters found for type %s" % format)
@@ -365,12 +366,12 @@ class XMLEmitter(Emitter):
                 self._to_xml(xml, item)
                 xml.endElement("resource")
         elif isinstance(data, dict):
-            for key, value in data.iteritems():
+            for key, value in six.iteritems(data):
                 xml.startElement(key, {})
                 self._to_xml(xml, value)
                 xml.endElement(key)
         else:
-            xml.characters(smart_unicode(data))
+            xml.characters(smart_text(data))
 
     def render(self, request):
         stream = StringIO.StringIO()

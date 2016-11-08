@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import inspect, handler
 
 from piston.handler import typemapper
@@ -89,7 +90,7 @@ class HandlerDocumentation(object):
             if not met:
                 continue
                 
-            stale = inspect.getmodule(met.im_func) is not inspect.getmodule(self.handler)
+            stale = inspect.getmodule(met.__func__) is not inspect.getmodule(self.handler)
 
             if not self.handler.is_anonymous:
                 if met and (not stale or include_default):

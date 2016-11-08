@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from django.conf.urls.defaults import *
 from piston.resource import Resource
 from piston.authentication import HttpBasicAuthentication

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from django.middleware.http import ConditionalGetMiddleware
 from django.middleware.common import CommonMiddleware
 

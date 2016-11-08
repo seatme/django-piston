@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import os
 DEBUG = True
 DATABASE_ENGINE = 'sqlite3'

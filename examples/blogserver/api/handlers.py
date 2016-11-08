@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from piston.handler import BaseHandler, AnonymousBaseHandler
 from piston.utils import rc, require_mime, require_extended
 

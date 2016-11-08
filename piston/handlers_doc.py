@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from piston.doc import generate_doc
 from piston.handler import handler_tracker
 import re

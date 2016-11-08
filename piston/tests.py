@@ -1,4 +1,5 @@
 # Django imports
+from __future__ import absolute_import
 from django.core import mail
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -11,11 +12,11 @@ except ImportError:
     import json as simplejson
 
 # Piston imports
-from test import TestCase
-from models import Consumer
-from handler import BaseHandler
-from utils import rc
-from resource import Resource
+from .test import TestCase
+from .models import Consumer
+from .handler import BaseHandler
+from .utils import rc
+from .resource import Resource
 
 class ConsumerTest(TestCase):
     fixtures = ['models.json']

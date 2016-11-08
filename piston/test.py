@@ -1,4 +1,5 @@
 # Django imports
+from __future__ import absolute_import
 import django.test.client as client
 import django.test as test
 from django.utils.http import urlencode
