@@ -142,17 +142,27 @@ def test():
       >>> is_valid_javascript_identifier('$210')
       True
 
+    """
+    """
       >>> is_valid_javascript_identifier(u'Stra\u00dfe')
       True
+    """
+    """
 
       >>> is_valid_javascript_identifier(r'\u0062') # u'b'
       True
+    """
+    """
 
       >>> is_valid_javascript_identifier(r'\u62')
       False
+    """
+    """
 
       >>> is_valid_javascript_identifier(r'\u0020')
       False
+    """
+    """
 
       >>> is_valid_javascript_identifier('_bar')
       True
@@ -162,8 +172,7 @@ def test():
 
       >>> is_valid_javascript_identifier('$')
       True
-    """
-    """
+
     But ``is_valid_jsonp_callback_value`` is the function you want to use for
     validating JSON-P callback parameter values:
 
